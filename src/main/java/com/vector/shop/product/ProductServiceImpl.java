@@ -1,6 +1,6 @@
 package com.vector.shop.product;
 
-import java.util.Date;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.vector.shop.product.comment.Comment;
 import com.vector.shop.product.comment.CommentRepository;
 import com.vector.shop.user.User;
-import com.vector.shop.user.UserRepository;
+
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -26,8 +26,6 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private CommentRepository commentRepo;
 
-    @Autowired
-    private UserRepository userRepo;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -86,5 +84,12 @@ public class ProductServiceImpl implements ProductService{
     public List<Comment> loadComments(Product p) {
         return commentRepo.findAll().stream()
         .filter(product->product.getProduct().getId()==p.getId()).toList();
+    }
+
+    @Override
+    public void rate(int rating, long id) {
+        Product product = findById(id);
+        product.increaseRating(rating);
+        update(product);
     }
 }

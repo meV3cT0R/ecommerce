@@ -1,6 +1,6 @@
 package com.vector.shop.product;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -88,5 +88,13 @@ public class ProductController {
     
         productService.saveComment(comment,user,productService.findById(Long.valueOf(id)));
         return "redirect:/"+productDetail(user, Long.valueOf(id), model)+"/"+id;
+    }
+
+    @PostMapping("/rate")
+    public String rateProduct(Model model,@AuthenticationPrincipal User user,
+    @RequestParam("userRating") String userRating,
+    @RequestParam("id") String id) {
+        productService.rate(Integer.parseInt(userRating), Long.parseLong(id));
+        return productDetail(user, Long.parseLong(id), model);
     }
 }

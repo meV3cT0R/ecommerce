@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -24,6 +26,7 @@ import com.vector.shop.user.UserRepository;
 
 @SpringBootApplication
 public class ShopApplication {
+	private static final Logger log = LoggerFactory.getLogger(ShopApplication.class);
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	public static void main(String[] args) {
@@ -57,8 +60,11 @@ public class ShopApplication {
 			storageService.deleteAll();
 			storageService.init();
 
-			Files.copy(Paths.get("/home/vector/Downloads/hello-kitty-wallpaper-37_605.webp"),Paths.get("/home/vector/Documents/vscode-workspace/java/shop/images/kitty.webp"));
+			Files.copy(Paths.get("/home/vector/Downloads/hello-kitty-wallpaper-37_605.webp"),Paths.get("/home/vector/Documents/vscode-workspace/shop/images/kitty.webp"));
 			product.setImage("http://localhost:8080/product/images/kitty.webp");
+			product.increaseRating(5);
+			product.increaseRating(2);
+			log.info(String.format("Average rating : %f",product.getAverageRating()));
 			productService.save(product);	
 		};
 	}
