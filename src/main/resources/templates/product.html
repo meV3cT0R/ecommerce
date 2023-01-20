@@ -55,6 +55,11 @@
           <img th:src="${product.image}" width="200" height="200">
           <p>Available: [[${product.quantity}]]</p>
           <p>Price : [[${product.price}]]</p>
+          <div class="card mb-4">
+            <div class="card-body">
+              [[${product.description}]]
+            </div>
+          </div>
           <form th:action="@{/addincart}" method="GET">
             <input type="hidden" th:value="${product.id}" name="productId"/>
             <button type="submit" class="btn btn-outline-warning">Add in Cart</button>
@@ -85,7 +90,7 @@
                 <span class="fa fa-star post-star"></span>
                 <input type="hidden" name="userRating" id="userRating"/>
                 <input type="hidden" name="id" th:value="${product.id}"/>
-                <button type="submit" class="btn btn-outline-danger" id="rate">submit</button>
+                <button type="submit" class="btn btn-outline-danger" id="rate" th:if="${!product.hasRatedThisProduct(user,product)}">submit</button>
               </form>
             </div>
           </div>
@@ -111,52 +116,8 @@
         </div>
       </div>
     </div>
-    <script>
-      var star = document.getElementsByClassName("pre-star");
-      var value = parseInt(document.getElementById("rating").textContent);
-      console.log(value);
-      rate(star,value-1);
-
+    <script src="/js/rating.js">
       
-      var postStar = document.getElementsByClassName("post-star");
-      postStar[0].addEventListener("click",()=> {
-        rate(postStar,0);
-      });
-      postStar[1].addEventListener("click",()=> {
-        rate(postStar,1);
-      });
-      postStar[2].addEventListener("click",()=> {
-        rate(postStar,2);
-      });
-      postStar[3].addEventListener("click",()=> {
-        rate(postStar,3);
-      });
-      postStar[4].addEventListener("click",()=> {
-        rate(postStar,4);
-      });
-
-
-      document.getElementById("rate").addEventListener("click",()=>{
-        var count = 0;
-        for(var i=0;i<postStar.length;i++) {
-          if(postStar[i].classList.contains("text-warning")) {
-            count++;
-          }
-        }
-
-        document.getElementById("userRating").value = count;
-        document.getElementById("ratingForm").submit();
-      });
-
-
-      function rate(star,index) {
-        for(var i=0;i<star.length;i++) {
-          star[i].classList.remove("text-warning");
-        }star
-        for(var i=0;i<=index;i++) {
-          star[i].classList.add("text-warning");
-        }
-      }
     </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

@@ -14,5 +14,5 @@ public interface ProductService {
     Product update(Product product);
     Comment saveComment(Comment comment,User user,Product product);
     List<Comment> loadComments(Product p);
-    void rate(int rating,long id);
+    void rate(int rating,long id,User user);
 }

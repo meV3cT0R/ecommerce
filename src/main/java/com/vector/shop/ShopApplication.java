@@ -64,6 +64,7 @@ public class ShopApplication {
 			product.setImage("http://localhost:8080/product/images/kitty.webp");
 			product.increaseRating(5);
 			product.increaseRating(2);
+			product.setDescription("Nice hello kitty\nkeeping this in your bedroom will bring you great luck");
 			log.info(String.format("Average rating : %f",product.getAverageRating()));
 			productService.save(product);	
 		};

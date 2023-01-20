@@ -94,7 +94,7 @@ public class ProductController {
     public String rateProduct(Model model,@AuthenticationPrincipal User user,
     @RequestParam("userRating") String userRating,
     @RequestParam("id") String id) {
-        productService.rate(Integer.parseInt(userRating), Long.parseLong(id));
-        return productDetail(user, Long.parseLong(id), model);
+        productService.rate(Integer.parseInt(userRating), Long.parseLong(id),user);
+        return "redirect:/" + productDetail(user, Long.parseLong(id), model)+"/"+id;
     }
 }

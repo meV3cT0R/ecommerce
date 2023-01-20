@@ -25,6 +25,8 @@ public class ProductServiceImpl implements ProductService{
     private ProductRepository productRepo;
     @Autowired
     private CommentRepository commentRepo;
+    @Autowired
+    private UserRatingRepo userRatingRepo;
 
 
     @PersistenceContext
@@ -87,9 +89,14 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public void rate(int rating, long id) {
+    public void rate(int rating, long id,User user) {
         Product product = findById(id);
         product.increaseRating(rating);
+        UserRating userRating = new UserRating();
+        userRating.setProduct(product);
+        userRating.setUser(user);
+        userRating.setRating(rating);
+        userRatingRepo.save(userRating);
         update(product);
     }
 }

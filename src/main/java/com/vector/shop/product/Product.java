@@ -37,6 +37,12 @@ public class Product implements Serializable{
     @OneToMany(mappedBy = "product",cascade = CascadeType.MERGE)
     private List<Comment> comments;
 
+    @ManyToMany
+    private List<User> rate;
+
+    @OneToMany(mappedBy = "product")
+    private List<UserRating> userRatings;
+
     private int[] rating = {0,0,0,0,0}; 
 
     enum Type{
@@ -68,5 +74,12 @@ public class Product implements Serializable{
             totalRatingCount+=rating[i];
         }
         return totalRating/totalRatingCount;
+    }
+
+    public boolean hasRatedThisProduct(User user,Product product) {
+        UserRating meowRating = new UserRating();
+        meowRating.setUser(user);
+        meowRating.setProduct(product);
+        return userRatings.contains(meowRating);
     }
 }
