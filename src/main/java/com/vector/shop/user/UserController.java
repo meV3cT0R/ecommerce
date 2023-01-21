@@ -1,6 +1,9 @@
 package com.vector.shop.user;
 
 
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,9 +52,18 @@ public class UserController {
 
     @PostMapping("/register")
     public String registerUser(Model model,User user) {
-        userService.save(user);
-        return "login";
-        
+        Map<Error,String> errors = userService.validate(user);
+        if(errors.isEmpty()){
+            userService.save(user);
+            return "login";
+        }
+
+        for(Map.Entry<Error,String> entry: errors.entrySet()) {
+            log.info(entry.getKey() + " : "+entry.getValue());
+            model.addAttribute(entry.getKey().name().toLowerCase()+"Error",
+              entry.getValue());
+        }
+        return "register";
     }
 
     @GetMapping("/cpanel")

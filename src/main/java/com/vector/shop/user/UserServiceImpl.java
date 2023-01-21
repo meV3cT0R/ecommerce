@@ -2,9 +2,10 @@ package com.vector.shop.user;
 
 import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,5 +130,47 @@ public class UserServiceImpl implements UserService {
         bill.setProducts(items);
         bill.calculateTotalprice();
         return bill;
-    }    
+    }
+
+    @Override
+    public User find(String username) {
+        return userRepo.findByUsername(username);
+    }
+    @Override
+    public Map<Error, String> validate(User user) {
+        Map<Error,String> errors = new HashMap<>();
+        validation(user,errors,user.getFirstName(),Error.FIRSTNAME,6,30,false,"[a-zA-Z]");
+        validation(user,errors,user.getLastName(),Error.LASTNAME,6,30,false,"[a-zA-Z]");
+        validation(user,errors,user.getPassword(),Error.PASSWORD,6,30,false,"\\s");
+        validation(user,errors,user.getUsername(),Error.USERNAME,6,30,true,"[a-zA-Z0-9]");
+        if(user.getGender()!='M' || user.getGender()!='F'){
+            errors.put(Error.GENDER,"what ? the fuck? you don't have gender?");
+        }
+        if(user.getDob().compareTo(new Date()) > 0) {
+            errors.put(Error.BIRTHDATE, "are you not born yet?");
+        }
+        return errors;
+    }
+    
+    //min inclusive
+    // max exclusive
+    private void validation(User user,Map<Error,String> errors,String validate,Error error,int min,int max,boolean checkInDb,String regex) {
+        String name = (Stream.of(error.name().toLowerCase()).
+        map(string->{
+           return (Character.toUpperCase(string.charAt(0))+ string.substring(1));
+        }).reduce((a,b)->a+b).get()
+
+       );
+        if(validate.length() >= max || validate.length() < min) {
+            errors.put(error,String.format("%s must be between %d-%d",name,min,max));
+        }else
+        if(!validate.matches(regex)) {
+            errors.put(error,name+" must be alphanumeric");
+        }else 
+            if(checkInDb) {
+                if(user.equals(find(validate))) {
+                   errors.put(error,name+"already in use");
+               }
+            }
+    }   
 }
