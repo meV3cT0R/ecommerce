@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -101,7 +102,6 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public Bill buy(User user, Product product) {
-
         return null;
     }
     
@@ -139,16 +139,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public Map<Error, String> validate(User user) {
         Map<Error,String> errors = new HashMap<>();
-        validation(user,errors,user.getFirstName(),Error.FIRSTNAME,6,30,false,"[a-zA-Z]");
-        validation(user,errors,user.getLastName(),Error.LASTNAME,6,30,false,"[a-zA-Z]");
-        validation(user,errors,user.getPassword(),Error.PASSWORD,6,30,false,"\\s");
-        validation(user,errors,user.getUsername(),Error.USERNAME,6,30,true,"[a-zA-Z0-9]");
-        if(user.getGender()!='M' || user.getGender()!='F'){
+        if(user.getGender()!='M' && user.getGender()!='F'){
             errors.put(Error.GENDER,"what ? the fuck? you don't have gender?");
+            
         }
-        if(user.getDob().compareTo(new Date()) > 0) {
+        if(user.getDob() ==null) {
+            errors.put(Error.BIRTHDATE,"no birth date?");
+        }else 
+            if(user.getDob().compareTo(new Date()) > 0) {
             errors.put(Error.BIRTHDATE, "are you not born yet?");
         }
+
+        if(user.getPhoneNumbers() !=null) {
+            user.getPhoneNumbers().stream().forEach(pn-> {
+                if(pn.getNumber() == null) {
+                    errors.put(Error.PHONENUMBER,"Phone number invalid");
+                }
+                else if(pn.getNumber().trim().length() != 10)
+                    errors.put(Error.PHONENUMBER,"Phone number invalid"); 
+            });
+        }
+        validation(user,errors,user.getFirstName(),Error.FIRSTNAME,6,30,false,"[a-zA-Z]+");
+        validation(user,errors,user.getLastName(),Error.LASTNAME,6,30,false,"[a-zA-Z]+");
+        validation(user,errors,user.getPassword(),Error.PASSWORD,6,30,false,"[a-zA-Z0-9&!@#$%^*()]+");
+        validation(user,errors,user.getUsername(),Error.USERNAME,6,30,true,"[a-zA-Z0-9]+");
+        for(Map.Entry<Error,String> entry : errors.entrySet()) {
+            System.out.printf("%-10s%-20s%n",entry.getKey(),entry.getValue());
+        }
+
         return errors;
     }
     
@@ -161,7 +179,10 @@ public class UserServiceImpl implements UserService {
         }).reduce((a,b)->a+b).get()
 
        );
-        if(validate.length() >= max || validate.length() < min) {
+       if(validate == null) {
+        errors.put(error,name+" Can't be null");
+       }
+        else if(validate.length() >= max || validate.length() < min) {
             errors.put(error,String.format("%s must be between %d-%d",name,min,max));
         }else
         if(!validate.matches(regex)) {
@@ -172,5 +193,13 @@ public class UserServiceImpl implements UserService {
                    errors.put(error,name+"already in use");
                }
             }
+    }
+
+    @Override
+    public User login(String username, String password) {
+        Optional<User> user = userRepo.findByUsernameAndPassword(username,password);
+        if(!user.isPresent())
+            throw new UserNotFoundException("Username or password invalid");
+        return user.get();
     }   
 }

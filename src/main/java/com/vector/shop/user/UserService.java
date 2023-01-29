@@ -18,4 +18,5 @@ public interface UserService {
     Bill viewCart(User user);
     Map<Error,String> validate(User user);
     User find(String username);
+    User login(String username,String password);
 }

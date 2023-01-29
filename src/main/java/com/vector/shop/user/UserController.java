@@ -1,8 +1,10 @@
 package com.vector.shop.user;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import com.vector.shop.bill.Bill;
 import com.vector.shop.product.Product;
 import com.vector.shop.product.ProductService;
 import com.vector.shop.user.card.Card;
+import com.vector.shop.user.phonenumber.PhoneNumber;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -47,12 +50,15 @@ public class UserController {
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("user", new User());
+        model.addAttribute("phoneNumber",new PhoneNumber());
         return "register";
     }
 
     @PostMapping("/register")
-    public String registerUser(Model model,User user) {
+    public String registerUser(Model model,User user,PhoneNumber phoneNumber) {
+        user.addPhoneNumber(phoneNumber);
         Map<Error,String> errors = userService.validate(user);
+
         if(errors.isEmpty()){
             userService.save(user);
             return "login";
@@ -63,6 +69,7 @@ public class UserController {
             model.addAttribute(entry.getKey().name().toLowerCase()+"Error",
               entry.getValue());
         }
+        System.out.println(user);
         return "register";
     }
 
@@ -105,7 +112,7 @@ public class UserController {
            System.out.println(bill);
         }catch(NoCreditCardException cce) {
             log.warn(cce.getMessage());
-
+            model.addAttribute("user",user);
             model.addAttribute("card",new Card());
             return "creditcard";
         }catch(CartEmptyException cee) {
@@ -121,5 +128,21 @@ public class UserController {
     public String saveCard(Model model,@AuthenticationPrincipal User user,Card card) {
         userService.saveCreditCard(user, card);
         return viewCart(model, user);
+    }
+
+    @GetMapping("/dashboard")
+    public String dashBoard() {
+        return "dashboard";
+    }
+
+    @GetMapping("/buy") 
+    public String buy(Model model,@AuthenticationPrincipal User user,@RequestParam("productId") String id) {
+        model.addAttribute("user",user);
+        List<Product> item = new ArrayList<>();
+        item.add(productService.findById(Long.parseLong(id)));
+        user.setCart(item);
+        userService.update(user);
+        model.addAttribute("bill",userService.viewCart(user));
+        return "bill";
     }
 }

@@ -38,6 +38,10 @@
                     <input class="form-control mt-4" type="password" name="password" placeholder="Passowrd"/>
                     <p class="text-danger" th:if="${passwordError}" th:text="${passwordError}">
                     </p>
+
+                    <input class="form-control mt-4" type="text" th:object="${phoneNumber}" name="number" placeholder="phoneNumber"/>
+                    <p class="text-danger" th:if="${phonenumberError}" th:text="${phonenumberError}">
+                    </p>
                     <input class="form-control mt-4" type="date" name="dob" placeholder="Passowrd"/>
                     <p class="text-danger" th:if="${birthdateError}" th:text="${birthdateError}">
                     </p>

@@ -1,10 +1,11 @@
 package com.vector.shop.user;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.vector.shop.product.Product;
 import com.vector.shop.product.comment.Comment;
 import com.vector.shop.user.card.Card;
+import com.vector.shop.user.phonenumber.PhoneNumber;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -43,6 +45,10 @@ public class User implements UserDetails{
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private Date dob;
     private boolean admin;
+
+    @OneToMany(mappedBy="user")
+    private List<PhoneNumber> phoneNumbers;
+
     @ManyToMany
     @JoinTable(name="users_cart",
     joinColumns = @JoinColumn(name="user_id"),
@@ -94,5 +100,14 @@ public class User implements UserDetails{
 
     public boolean hasBoughtProduct(Product product) {
         return bought.contains(product);
+    }
+    public PhoneNumber addPhoneNumber(PhoneNumber phoneNumber) {
+        if(this.getPhoneNumbers() == null){
+            this.setPhoneNumbers(new ArrayList<PhoneNumber>());
+        }
+        if(this.getPhoneNumbers().add(phoneNumber))
+            return phoneNumber;
+        else
+            return null;
     }
 }

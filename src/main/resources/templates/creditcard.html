@@ -11,8 +11,43 @@
     <title>Hello, world!</title>
   </head>
   <body>
-    <div class="container">
-        <div class="row justify-content-center">
+    <div class="container-fluid">
+        <div th:if="${user.isAdmin}" class="row justify-content-center">
+          <div class="col-md-2"></div>
+          <div class="col-md-6 navbar">
+              <ul class="nav nav-tabs">
+                  <li class="nav-item"> <a class="nav-link" th:href="@{/}"> home </a> </li>
+                  <li class="nav-item"> <a class="nav-link" th:href="@{/cpanel}"> cpanel </a> </li>
+                  <li class="nav-item"> <a class="nav-link" th:href="@{/dashboard}"> dashboard </a> </li>
+              </ul>
+          </div>
+        </div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <form th:action="@{/product/search}" method="GET" class="form-inline">
+                    <div class="input-group">
+                        <input type="text" name="searchInput" class="form-control" placeholder="Search Product" />
+                        <button class="btn btn-outline-success ml-2">search</button>
+                    </div>
+                </form>
+            </div>
+          <div class="col-md-6 text-right">
+              <p>
+              Hello
+              <strong>
+                  <span th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span>
+              </strong>
+              <span class="badge badge-warning" th:if="${user.isAdmin}">admin</span>
+              </p>
+              <a th:href="@{/cart}">
+                cart
+              </a>
+              <form method="post" th:action="@{/logout}" class=" ml-2 float-right">
+                  <button class="btn btn-outline-danger"> fuck off</button>
+              </form>
+          </div>
+      </div>
+        <div class="row justify-content-center border-top mt-4 py-4 container mx-auto">
             <div class="col-md-6">
                 <form th:action="@{/card/save}" method="POST" th:object="${card}">
                     <input type="text" class="form-control mt-2" name="ccNumber" placeholder="Credit Card Number"/>
